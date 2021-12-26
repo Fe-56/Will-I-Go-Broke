@@ -1,6 +1,9 @@
 import telebot
+import os
+dirname = os.path.dirname(__file__)
+filename_api_key = os.path.join(dirname, 'Data/api_key.txt')
 
-API_KEY = open('api_key.txt', 'r').read()
+API_KEY = open(filename_api_key, 'r').read()
 bot = telebot.TeleBot(API_KEY)
 
 # /info
@@ -16,7 +19,9 @@ def greet(message):
 # /help
 @bot.message_handler(commands = ['help', 'Help'])
 def help(message):
-    with open('commands_and_descriptions.txt') as commands_and_descriptions: # opens the commands_and_description.txt file and reads the content, line by line
+    filename_commands_and_descriptions = os.path.join(dirname, 'Data/commands_and_descriptions.txt')
+
+    with open(filename_commands_and_descriptions) as commands_and_descriptions: # opens the commands_and_description.txt file and reads the content, line by line
         lines = commands_and_descriptions.readlines()
 
     output = ''
