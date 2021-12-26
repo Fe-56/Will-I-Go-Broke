@@ -1,5 +1,8 @@
 import telebot
+from telebot import types
 import os
+from user import User
+
 dirname = os.path.dirname(__file__)
 filename_api_key = os.path.join(dirname, 'Data/api_key.txt')
 
@@ -36,9 +39,11 @@ def help(message):
 def disclaimer(message):
     bot.send_message(message.chat.id, "This bot does not:\n\n\n1. Collect your data or whatsoever\n\n2. This bot only serves to be a quick tool for you to input your finances over your university/school life so you can better visualise them and is not a full-fledged financial planner\n\n3. This bot only takes into account of controllable finances that you input yourself, and any market fluctuations in the economy will not be accounted for")
 
-# # /plan
-# @bot.message_handler(commands = ['plan', 'Plan'])
-# def plan(message):
+# /plan
+@bot.message_handler(commands = ['plan', 'Plan'])
+def plan(message):
+    markup = types.ForceReply(selective=False)
+    bot.send_message(message.chat.id, "What is your current bank balance?", reply_markup = markup)
 
 # /feedback
 @bot.message_handler(commands = ['feedback', 'Feedback'])
