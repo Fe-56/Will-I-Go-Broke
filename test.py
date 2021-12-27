@@ -10,3 +10,7 @@ from user import User
 
 hello = User('John')
 print(hello.name)
+
+import plan
+
+print(plan.hello('hi'))
