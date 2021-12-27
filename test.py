@@ -1,3 +1,5 @@
+# this file is just for testing purposes with no link at all to the actual code
+
 import os
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, 'Data/api_key.txt')
