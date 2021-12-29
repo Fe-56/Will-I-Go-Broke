@@ -13,4 +13,4 @@ print(hello.name)
 
 import plan
 
-print(plan.hello('hi'))
+print(plan.is_valid_amount('123'))
