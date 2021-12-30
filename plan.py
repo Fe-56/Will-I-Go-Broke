@@ -42,7 +42,15 @@ def is_valid_date(input): # this function checks if input is a valid date in the
         if input[0] == '/' or input[-1] == '/':
             return False # the first or last character must not be a slash
 
-        else:
+        else: # check whether the graduation date is after the current date
+            import datetime as datetime
+            current_month = datetime.now().month # gets the current month
+            current_year = datetime.now().year # gets the current year
+
+            if int(input[3:]) == current_year: # compares the graduation year to the current year
+                if int(input[:2]) <= current_month: # compares the graduaton month to the current month
+                    return False # reach here if the current year is the same as the graduation year and the current month is after the graduation month
+
             return True
 
 # def current_bank_balance_step(message):
