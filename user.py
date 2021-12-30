@@ -37,3 +37,9 @@ class User:
 
         else: # if the graduation year is after the current year
                 return (12 - current_month) + (12 * (int(self.graduation_date[3:]) - current_year - 1)) + int(self.graduation_date[:2])
+
+    @property
+    def expenses_total_school_fees_left_to_pay(self): # gets the total amount of school fees the user has to pay from now tll graduation
+        return self.school_fees_per_period * self.number_of_periods_to_pay_school_fees
+
+    
