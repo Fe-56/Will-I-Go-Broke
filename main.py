@@ -61,7 +61,7 @@ def current_bank_balance_step(message):
         return
 
     user = users[chat_id] # gets the user object instance from the users dictionary
-    user.current_bank_balance = user_input # since the user_input at this point is a valid amount of money
+    user.current_bank_balance = float(user_input) # since the user_input at this point is a valid amount of money
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(chat_id, 'When are you expected to graduate? Please input the month and year in this format: MM/YYYY, e.g. 01/2025 for January 2025', reply_markup = markup) # ForceReply
     bot.register_next_step_handler(sent_message, graduation_date_step)
@@ -78,9 +78,7 @@ def graduation_date_step(message):
     user = users[chat_id] # gets the user object instance from the users dictionary
     user.graduation_date = user_input
 
-    '''Code for calculating the amount of time in weeks/months between the current time and the user's graduation date''' # probably need to write the code as a method or computed property in the User class in user.py
-
-    bot.send_message(chat_id, f'Your username is {user.name}, your current bank balance is {user.current_bank_balance} and your expected graduation date is {user.graduation_date}')
+    bot.send_message(chat_id, f'Your username is {user.name}, your current bank balance is ${user.current_bank_balance} and your expected graduation date is {user.graduation_date} and you have {user.time_from_now_till_graduation} month(s) till graduation!')
 
 # /feedback
 @bot.message_handler(commands = ['feedback'])
