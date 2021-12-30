@@ -43,7 +43,7 @@ def is_valid_date(input): # this function checks if input is a valid date in the
             return False # the first or last character must not be a slash
 
         else: # check whether the graduation date is after the current date
-            import datetime as datetime
+            from datetime import datetime
             current_month = datetime.now().month # gets the current month
             current_year = datetime.now().year # gets the current year
 

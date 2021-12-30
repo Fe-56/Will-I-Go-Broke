@@ -56,7 +56,7 @@ def current_bank_balance_step(message):
     chat_id = message.chat.id
 
     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
-        sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maximum of one decmial point')
+        sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maximum of one decmial point and be a positive value!')
         bot.register_next_step_handler(sent_message, current_bank_balance_step)
         return
 
@@ -71,14 +71,14 @@ def graduation_date_step(message):
     chat_id = message.chat.id
 
     if not is_valid_date(user_input): # if the user input is not a valid date in the format: MM/YYYY
-        sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY')
+        sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY, and must be at least in the following month of the current month!')
         bot.register_next_step_handler(sent_message, graduation_date_step)
         return
 
     user = users[chat_id] # gets the user object instance from the users dictionary
     user.graduation_date = user_input
 
-    '''Code for calculating the amount of time in weeks/months between the current time and the user's graduation date'''
+    '''Code for calculating the amount of time in weeks/months between the current time and the user's graduation date''' # probably need to write the code as a method or computed property in the User class in user.py
 
     bot.send_message(chat_id, f'Your username is {user.name}, your current bank balance is {user.current_bank_balance} and your expected graduation date is {user.graduation_date}')
 
