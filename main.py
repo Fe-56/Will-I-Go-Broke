@@ -2,7 +2,7 @@ import telebot
 from telebot import types
 import os
 from user import User # imports the User class from User.py
-from plan import is_valid_amount, is_valid_date # imports these functions in the plan.py file
+from plan import * # imports all the functions in the plan.py file
 
 dirname = os.path.dirname(__file__)
 filename_api_key = os.path.join(dirname, 'Data/api_key.txt')
@@ -46,6 +46,7 @@ users = dict() # creates dictionary of users in a session with the bot?
 @bot.message_handler(commands = ['plan'])
 def plan(message):
     user = User(message.from_user.username) # cretes a User class with the Telegram username as the name attribute
+    user.monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of hte expenses
     users[message.chat.id] = user # stores the chat ID as the key and the User object as the value
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(message.chat.id, "What is your current bank balance? (Please omit the dollar sign)", reply_markup = markup) # ForceReply
@@ -111,24 +112,30 @@ def number_of_periods_to_pay_school_fees_step(message):
     user = users[chat_id]
     user.number_of_periods_to_pay_school_fees = int(user_input)
     markup = types.ForceReply(selective = False) # for a ForceReply
-    sent_message = bot.send_message(chat_id, 'Please input your expected monthly ', reply_markup = markup) # ForceReply
+    sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300', reply_markup = markup) # ForceReply
     bot.register_next_step_handler(sent_message, monthly_expenses_step)
 
 def monthly_expenses_step(message):
     user_input = message.text # gets the user input
     chat_id = message.chat.id
+    user = users[chat_id] 
 
-    if not is_valid_amount(user_input): # if the user input is not a valid amount of money
-        sent_message = bot.reply_to(message, 'The number of terms/semester should be a positive number with no decimal places!')
-        bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
-        return
+    while user_input.lower() != 'done':
+        if is_valid_expense(user_input):
+            expense_name, expense_amount = get_monthly_expense(user_input)
+            user.monthly_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
+            sent_message = bot.send_message(chat_id, 'Please input your next monthly expense! If you are done, please input done')
+            bot.register_next_step_handler(sent_message, monthly_expenses_step)
+            return
 
-    user = users[chat_id]
-    user.number_of_periods_to_pay_school_fees = int(user_input)
-    markup = types.ForceReply(selective = False) # for a ForceReply
-    sent_message = bot.send_message(chat_id, 'What are your expected monthly expenses from now till graduation? Try to input consistent and predictable expenses like food, transportation, subscriptions, etc.', reply_markup = markup) # ForceReply
-    bot.register_next_step_handler(sent_message, monthly_expenses_step)
+        else:
+            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive)and 1 colon')
+            bot.register_next_step_handler(sent_message, monthly_expenses_step)
+            return
 
+    '''This is just to test whether the monthly expenses dictionary is correctly implemented'''
+    bot.send_message(chat_id, f'{user.monthly_expenses}')
+    
 # /feedback
 @bot.message_handler(commands = ['feedback'])
 def feedback(message):

@@ -53,6 +53,27 @@ def is_valid_date(input): # this function checks if input is a valid date in the
 
             return True
 
+def is_valid_expense(input): # this function checks if input is a valid (monthly) expense in the format: Name: Amount
+    if input.count(':') != 1:
+        return False
+
+    else:
+        colon_index = input.index(':') # gets the index of the colon, :
+
+        if input[colon_index + 1] != ' ': # if the character right after the colon : is not an empty space
+            return False
+
+        elif not is_valid_amount(input[colon_index + 2:]): # if the characters right after the space right after the colon: is not a valid amount of money
+            return False
+
+    return True
+
+def get_monthly_expense(input):
+    colon_index = input.index(':') # gets the index of the colon, :
+    expense_name = input[:colon_index] # gets the name of the expense
+    expense_amount = input[colon_index + 2:] # gets the amount of the expense
+    return expense_name, float(expense_amount)
+
 # def current_bank_balance_step(message):
 #     user_input = message.text # gets the user input
 
