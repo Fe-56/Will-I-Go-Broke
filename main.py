@@ -110,10 +110,24 @@ def number_of_periods_to_pay_school_fees_step(message):
 
     user = users[chat_id]
     user.number_of_periods_to_pay_school_fees = int(user_input)
+    markup = types.ForceReply(selective = False) # for a ForceReply
+    sent_message = bot.send_message(chat_id, 'Please input your expected monthly ', reply_markup = markup) # ForceReply
+    bot.register_next_step_handler(sent_message, monthly_expenses_step)
 
-    '''To commence with the next step in /plan'''
+def monthly_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
 
-    bot.send_message(chat_id, f'You still have to pay ${user.expenses_total_school_fees_left_to_pay} at ${user.school_fees_per_period} per term/semester/year for {user.number_of_periods_to_pay_school_fees} term/semester/year (s)!')
+    if not is_valid_amount(user_input): # if the user input is not a valid amount of money
+        sent_message = bot.reply_to(message, 'The number of terms/semester should be a positive number with no decimal places!')
+        bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
+        return
+
+    user = users[chat_id]
+    user.number_of_periods_to_pay_school_fees = int(user_input)
+    markup = types.ForceReply(selective = False) # for a ForceReply
+    sent_message = bot.send_message(chat_id, 'What are your expected monthly expenses from now till graduation? Try to input consistent and predictable expenses like food, transportation, subscriptions, etc.', reply_markup = markup) # ForceReply
+    bot.register_next_step_handler(sent_message, monthly_expenses_step)
 
 # /feedback
 @bot.message_handler(commands = ['feedback'])
