@@ -46,7 +46,9 @@ users = dict() # creates dictionary of users in a session with the bot?
 @bot.message_handler(commands = ['plan'])
 def plan(message):
     user = User(message.from_user.username) # cretes a User class with the Telegram username as the name attribute
-    user.monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of hte expenses
+    user.monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
+    user.big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
+    user.monthly_income = dict() # creates a dictionary to store the monthly income/allowance of the user, same concept as the monthly expenses
     users[message.chat.id] = user # stores the chat ID as the key and the User object as the value
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(message.chat.id, "What is your current bank balance? (Please omit the dollar sign)", reply_markup = markup) # ForceReply
@@ -156,14 +158,66 @@ def check_monthly_expenses_step(message):
     user = users[chat_id] 
 
     if user_input == 'Yes': # if the user states that the monthly expenses are correct and all good
-        bot.send_message(chat_id, 'All good!')
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Laptop: 2000', reply_markup = markup) # ForceReply
+        bot.register_next_step_handler(sent_message, big_expenses_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
         user.monthly_expenses.clear() # resets the dictionary containing the monthly expenses
         markup = types.ForceReply(selective = False) # for a ForceReply
         sent_message = bot.reply_to(message, 'Please input your monthly expenses again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
-        bot.register_next_step_handler(sent_message, monthly_expenses_step) 
+        bot.register_next_step_handler(sent_message, monthly_expenses_step)
+
+def big_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    while user_input.lower() != 'done':
+        if is_valid_expense(user_input):
+            expense_name, expense_amount = get_monthly_expense(user_input)
+            user.big_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input your next big expense! If you are done, please input done', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, big_expenses_step)
+            return
+
+        else:
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.reply_to(message, 'Please input a single big expense in the format: Name: Amount\n\n e.g. iPad: 1000\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, big_expenses_step)
+            return
+
+    printed_big_expenses = ''
+
+    for expense in user.big_expenses.keys():
+        printed_big_expenses += f'{expense}: ${user.big_expenses[expense]}' + '\n'
+
+    bot.send_message(chat_id, printed_big_expenses) # sends a message containing all the big one-time expenses that the user inputted earlier on
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+    markup.add('Yes', 'No')
+    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your one-time big expenses?', reply_markup = markup)
+    bot.register_next_step_handler(sent_message, check_big_expenses_step)
+
+def check_big_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    if user_input == 'Yes': # if the user states that the big expenses are correct and all good
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Salary: 1000', reply_markup = markup) # ForceReply
+        bot.register_next_step_handler(sent_message, monthly_income_step)
+
+    elif user_input == 'No': # if the user states that the monthly expenses are not correct
+        user.big_expenses.clear() # resets the dictionary containing the big expenses
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'Please input your big expenses again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, big_expenses_step)
+
+def monthly_income_step(message):
     
+
 # /feedback
 @bot.message_handler(commands = ['feedback'])
 def feedback(message):
