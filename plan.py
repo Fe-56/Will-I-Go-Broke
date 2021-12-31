@@ -51,6 +51,9 @@ def is_valid_date(input): # this function checks if input is a valid date in the
                 if int(input[:2]) <= current_month: # compares the graduaton month to the current month
                     return False # reach here if the current year is the same as the graduation year and the current month is after the graduation month
 
+            elif int(input[3:]) < current_year:
+                return False
+
             return True
 
 def is_valid_expense(input): # this function checks if input is a valid (monthly) expense in the format: Name: Amount

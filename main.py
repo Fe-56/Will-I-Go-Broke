@@ -57,7 +57,8 @@ def current_bank_balance_step(message):
     chat_id = message.chat.id
 
     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
-        sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maximum of one decmial point and be a positive value!')
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup)
         bot.register_next_step_handler(sent_message, current_bank_balance_step)
         return
 
@@ -72,7 +73,8 @@ def graduation_date_step(message):
     chat_id = message.chat.id
 
     if not is_valid_date(user_input): # if the user input is not a valid date in the format: MM/YYYY
-        sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY, and must be at least in the following month of the current month!')
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY, and must be at least in the following month of the current month!', reply_markup = markup)
         bot.register_next_step_handler(sent_message, graduation_date_step)
         return
 
@@ -90,7 +92,8 @@ def school_fees_per_period_step(message):
     chat_id = message.chat.id
 
     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
-        sent_message = bot.reply_to(message, 'The school fees should only consist of digits and a maximum of one decmial point and be a positive value!')
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'The school fees should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup)
         bot.register_next_step_handler(sent_message, school_fees_per_period_step)
         return
 
@@ -105,7 +108,8 @@ def number_of_periods_to_pay_school_fees_step(message):
     chat_id = message.chat.id
 
     if not user_input.isdigit(): # if the user input is not an integer >= 0
-        sent_message = bot.reply_to(message, 'The number of terms/semester should be a positive number with no decimal places!')
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'The number of terms/semester should be a positive number with no decimal places!', reply_markup = markup)
         bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
         return
 
@@ -124,17 +128,41 @@ def monthly_expenses_step(message):
         if is_valid_expense(user_input):
             expense_name, expense_amount = get_monthly_expense(user_input)
             user.monthly_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
-            sent_message = bot.send_message(chat_id, 'Please input your next monthly expense! If you are done, please input done')
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input your next monthly expense! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
 
         else:
-            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive)and 1 colon')
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
 
-    '''This is just to test whether the monthly expenses dictionary is correctly implemented'''
-    bot.send_message(chat_id, f'{user.monthly_expenses}')
+    printed_monthly_expenses = ''
+
+    for expense in user.monthly_expenses.keys():
+        printed_monthly_expenses += f'{expense}: ${user.monthly_expenses[expense]}' + '\n'
+
+    bot.send_message(chat_id, printed_monthly_expenses) # sends a message containing all the monthly expenses that the user inputted earlier on
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+    markup.add('Yes', 'No')
+    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly expenses?', reply_markup = markup)
+    bot.register_next_step_handler(sent_message, check_monthly_expenses_step)
+
+def check_monthly_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    if user_input == 'Yes': # if the user states that the monthly expenses are correct and all good
+        bot.send_message(chat_id, 'All good!')
+
+    elif user_input == 'No': # if the user states that the monthly expenses are not correct
+        user.monthly_expenses.clear() # resets the dictionary containing the monthly expenses
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'Please input your monthly expenses again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, monthly_expenses_step) 
     
 # /feedback
 @bot.message_handler(commands = ['feedback'])
