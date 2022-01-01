@@ -125,7 +125,7 @@ def monthly_expenses_step(message):
 
     while user_input.lower() != 'done':
         if is_valid_expense(user_input):
-            expense_name, expense_amount = get_monthly_expense(user_input)
+            expense_name, expense_amount = get_expense(user_input)
             user.monthly_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input your next monthly expense! If you are done, please input done', reply_markup = markup)
@@ -134,7 +134,7 @@ def monthly_expenses_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
+            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup)
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
 
@@ -172,8 +172,8 @@ def big_expenses_step(message):
 
     while user_input.lower() != 'done':
         if is_valid_expense(user_input):
-            expense_name, expense_amount = get_monthly_expense(user_input)
-            user.big_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
+            expense_name, expense_amount = get_expense(user_input)
+            user.big_expenses[expense_name] = expense_amount # stores the name and the amount of the big expenses in the dictionary in the user object instance
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input your next big expense! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, big_expenses_step)
@@ -203,7 +203,7 @@ def check_big_expenses_step(message):
 
     if user_input == 'Yes': # if the user states that the big expenses are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Salary: 1000', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Allowance from parents: 200\n\n NOTE: Whatever you input here should be the income/allowance that you are EXPECTED TO GET EVERY SINGLE MONTH till graduation and does not depend on whether it is during any vacation or internship or not!', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, monthly_income_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
@@ -213,7 +213,112 @@ def check_big_expenses_step(message):
         bot.register_next_step_handler(sent_message, big_expenses_step)
 
 def monthly_income_step(message):
-    pass
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    while user_input.lower() != 'done':
+        if is_valid_income(user_input):
+            income_name, income_amount = get_income(user_input)
+            user.monthly_income[income_name] = income_amount # stores the name and the amount of the monthly incomes in the dictionary in the user object instance
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input your next monthly income/allowance source! If you are done, please input done', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, monthly_income_step)
+            return
+
+        else:
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.reply_to(message, 'Please input a single source of monthly income/allowance in the format: Name: Amount\n\n e.g. Salary from freelance design job: 1000\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, monthly_income_step)
+            return
+
+    printed_monthly_income = ''
+
+    for income in user.monthly_income.keys():
+        printed_monthly_income += f'{income}: ${user.monthly_income[income]}' + '\n'
+
+    bot.send_message(chat_id, printed_monthly_income) # sends a message containing all the monthly income that the user inputted earlier on
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+    markup.add('Yes', 'No')
+    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly income/allowance sources?', reply_markup = markup)
+    bot.register_next_step_handler(sent_message, check_monthly_income_step)
+
+def check_monthly_income_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    if user_input == 'Yes': # if the user states that the monthly income are correct and all good
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input the total number of months of internships/vacations that you have from now till graduation', reply_markup = markup) # ForceReply
+        bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
+
+    elif user_input == 'No': # if the user states that the monthly income are not correct
+        user.monthly_income.clear() # resets the dictionary containing the monthly income
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'Please input your monthly income/allowance again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, monthly_income_step)
+
+def number_of_months_of_internships_and_vacations_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+
+    if not user_input.isdigit(): # if the user input is not an integer >= 0
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'The number of months of internships/vacations should be a positive number with no decimal places!', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
+        return
+
+    user = users[chat_id]
+    user.number_of_months_of_internships_and_vacations = int(user_input)
+    markup = types.ForceReply(selective = False) # for a ForceReply
+    sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income during internship/vacation period in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Internship salary: 1500', reply_markup = markup) # ForceReply
+    bot.register_next_step_handler(sent_message, internship_vacation_income_step)
+
+def internship_vacation_income_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    while user_input.lower() != 'done':
+        if is_valid_income(user_input):
+            income_name, income_amount = get_income(user_input)
+            user.internship_vacation_income[income_name] = income_amount # stores the name and the amount of the internship/vacation incomes in the dictionary in the user object instance
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input your next monthly internship/vacation income source! If you are done, please input done', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, internship_vacation_income_step)
+            return
+
+        else:
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.reply_to(message, 'Please input a single source of monthly internship/vacation income in the format: Name: Amount\n\n e.g. Waiter part time vacation job: 1800\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, internship_vacation_income_step)
+            return
+
+    printed_internship_vacation_income = ''
+
+    for income in user.internship_vacation_income.keys():
+        printed_internship_vacation_income += f'{income}: ${user.internship_vacation_income[income]}' + '\n'
+
+    bot.send_message(chat_id, printed_internship_vacation_income) # sends a message containing all the internship/vacation income that the user inputted earlier on
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+    markup.add('Yes', 'No')
+    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your internship/vacation income sources?', reply_markup = markup)
+    bot.register_next_step_handler(sent_message, check_internship_vacation_income_step)
+
+def check_internship_vacation_income_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    if user_input == 'Yes': # if the user states that the internship/vacation income are correct and all good
+        '''To continue with the next step of the calculation of all the incomes and the expenses'''
+
+    elif user_input == 'No': # if the user states that the monthly income are not correct
+        user.internship_vacation_income.clear() # resets the dictionary containing the internship/vacation income
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'Please input your monthly internship/vacation income again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, internship_vacation_income_step)
 
 # /feedback
 @bot.message_handler(commands = ['feedback'])

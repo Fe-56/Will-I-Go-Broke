@@ -71,37 +71,29 @@ def is_valid_expense(input): # this function checks if input is a valid (monthly
 
     return True
 
-def get_monthly_expense(input):
+def get_expense(input):
     colon_index = input.index(':') # gets the index of the colon, :
     expense_name = input[:colon_index] # gets the name of the expense
     expense_amount = input[colon_index + 2:] # gets the amount of the expense
     return expense_name, float(expense_amount)
 
-# def current_bank_balance_step(message):
-#     user_input = message.text # gets the user input
+def is_valid_income(input): # this function is just the same as  the is_valid_exense() function, the only difference is in the name, where this function is used to check if it is a valid monthly income in the format: Name: Amount, to avoid confusion in main.py
+    if input.count(':') != 1:
+        return False
 
-#     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
-#         sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maxumum of one decmial point')
-#         bot.register_next_step_handler(sent_message, current_bank_balance_step)
-#         return
+    else:
+        colon_index = input.index(':') # gets the index of the colon, :
 
-#     user = users[message.chat.id] # gets the user object instance from the users dictionary
-#     user.current_bank_balance = user_input # since the user_input at this point is a valid amount of money
-#     markup = types.ForceReply(selective = False) # for a ForceReply
-#     sent_message = bot.send_message(message, 'When are you expected to graduate? Please input the month and year in this format: MM/YYYY, e.g. 01/2025 for January 2025', reply_markup = markup) # ForceReply
-#     bot.register_next_step_handler(sent_message, graduation_date_step)
+        if input[colon_index + 1] != ' ': # if the character right after the colon : is not an empty space
+            return False
 
-# def graduation_date_step(message):
-#     user_input = message.text # gets the user input
+        elif not is_valid_amount(input[colon_index + 2:]): # if the characters right after the space right after the colon: is not a valid amount of money
+            return False
 
-#     if not is_valid_date(user_input): # if the user input is not a valid date in the format: MM/YYYY
-#         sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY')
-#         bot.register_next_step_handler(sent_message, graduation_date_step)
-#         return
+    return True
 
-#     user = user[message.chat.id] # gets the user object instance from the users dictionary
-#     user.graduation_date = user_input
-
-#     '''Code for calculating the amount of time in weeks/months between the current time and the user's graduation date'''
-
-#     bot.send_message(message.chat.id, f'Your username is {user.name}, your current bank balance is {user.current_bank_balance} and your expected graduation date is {user.graduation_date}')
+def get_income(input):
+    colon_index = input.index(':') # gets the index of the colon, :
+    income_name = input[:colon_index] # gets the name of the income
+    income_amount = input[colon_index + 2:] # gets the amount of the income
+    return income_name, float(income_amount)

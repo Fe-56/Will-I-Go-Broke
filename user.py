@@ -5,13 +5,28 @@ class User:
         self._name = name
         self._graduation_date = None
         self._current_bank_balance = 0
+        self._number_of_periods_to_pay_school_fees = 0
         self._monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
         self._big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
         self._monthly_income = dict() # creates a dictionary to store the monthly income/allowance of the user, same concept as the monthly expenses
+        self._number_of_months_of_internships_and_vacations = 0
+        self._internship_vacation_income = dict() # creates a dictionary to store the monthly income of the user only during the internship/vacation periods
 
     @property
     def name(self):
         return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+    @property
+    def graduation_date(self):
+        return self._graduation_date
+
+    @graduation_date.setter
+    def graduation_date(self, value):
+        self._graduation_date = value
 
     @property
     def current_bank_balance(self):
@@ -22,12 +37,12 @@ class User:
         self._current_bank_balance = value
 
     @property
-    def graduation_date(self):
-        return self._graduation_date
+    def number_of_periods_to_pay_school_fees(self):
+        return self._number_of_periods_to_pay_school_fees
 
-    @graduation_date.setter
-    def graduation_date(self, value):
-        self._graduation_date = value
+    @number_of_periods_to_pay_school_fees.setter
+    def number_of_periods_to_pay_school_fees(self, value):
+        self._number_of_periods_to_pay_school_fees = value
 
     @property
     def monthly_expenses(self):
@@ -52,6 +67,22 @@ class User:
     @monthly_income.setter
     def monthly_income(self, value):
         self._monthly_income = value
+
+    @property
+    def number_of_months_of_internships_and_vacations(self):
+        return self._number_of_months_of_internships_and_vacations
+
+    @number_of_months_of_internships_and_vacations.setter
+    def number_of_months_of_internships_and_vacations(self, value):
+        self._number_of_months_of_internships_and_vacations = value
+
+    @property
+    def internship_vacation_income(self):
+        return self._internship_vacation_income
+
+    @internship_vacation_income.setter
+    def internship_vacation_income(self, value):
+        self._internship_vacation_income = value
 
     @property
     def time_from_now_till_graduation(self): # calculates the amount of time in months between the current time and the graduation month and year
