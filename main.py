@@ -46,9 +46,6 @@ users = dict() # creates dictionary of users in a session with the bot?
 @bot.message_handler(commands = ['plan'])
 def plan(message):
     user = User(message.from_user.username) # cretes a User class with the Telegram username as the name attribute
-    user.monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
-    user.big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
-    user.monthly_income = dict() # creates a dictionary to store the monthly income/allowance of the user, same concept as the monthly expenses
     users[message.chat.id] = user # stores the chat ID as the key and the User object as the value
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(message.chat.id, "What is your current bank balance? (Please omit the dollar sign)", reply_markup = markup) # ForceReply
@@ -216,7 +213,7 @@ def check_big_expenses_step(message):
         bot.register_next_step_handler(sent_message, big_expenses_step)
 
 def monthly_income_step(message):
-    
+    pass
 
 # /feedback
 @bot.message_handler(commands = ['feedback'])
