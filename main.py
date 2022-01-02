@@ -79,9 +79,6 @@ def graduation_date_step(message):
 
     user = users[chat_id] # gets the user object instance from the users dictionary
     user.graduation_date = user_input
-
-    # bot.send_message(chat_id, f'Your username is {user.name}, your current bank balance is ${user.current_bank_balance} and your expected graduation date is {user.graduation_date} and you have {user.time_from_now_till_graduation} month(s) till graduation!')
-
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(chat_id, 'How much are your school fees per term/semester/year? Include things like tuition fees, and any other compulsory school fees. Please omit the dollar sign.', reply_markup = markup) # ForceReply
     bot.register_next_step_handler(sent_message, school_fees_per_period_step)

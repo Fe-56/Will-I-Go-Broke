@@ -3,8 +3,9 @@
 class User:
     def __init__(self, name):
         self._name = name
-        self._graduation_date = None
         self._current_bank_balance = 0
+        self._graduation_date = None
+        self._school_fees_per_period = 0
         self._number_of_periods_to_pay_school_fees = 0
         self._monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
         self._big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
@@ -21,6 +22,14 @@ class User:
         self._name = value
 
     @property
+    def current_bank_balance(self):
+        return self._current_bank_balance
+
+    @current_bank_balance.setter
+    def current_bank_balance(self, value):
+        self._current_bank_balance = value
+
+    @property
     def graduation_date(self):
         return self._graduation_date
 
@@ -29,12 +38,12 @@ class User:
         self._graduation_date = value
 
     @property
-    def current_bank_balance(self):
-        return self._current_bank_balance
+    def school_fees_per_period(self):
+        return self._school_fees_per_period
 
-    @current_bank_balance.setter
-    def current_bank_balance(self, value):
-        self._current_bank_balance = value
+    @school_fees_per_period.setter
+    def graduation_date(self, value):
+        self._school_fees_per_period = value
 
     @property
     def number_of_periods_to_pay_school_fees(self):
@@ -85,7 +94,7 @@ class User:
         self._internship_vacation_income = value
 
     @property
-    def time_from_now_till_graduation(self): # calculates the amount of time in months between the current time and the graduation month and year
+    def months_till_graduation(self): # calculates the amount of time in months between the current time and the graduation month and year
         from datetime import datetime
         current_month = datetime.now().month # gets the current month
         current_year = datetime.now().year # gets the current year
@@ -99,5 +108,20 @@ class User:
     @property
     def expenses_total_school_fees_left_to_pay(self): # gets the total amount of school fees the user has to pay from now tll graduation
         return self.school_fees_per_period * self.number_of_periods_to_pay_school_fees
+
+    @property
+    def expenses_total(self): # gets the total monthly expenses and big one-time expenses from now till graduation
+        total_expenses_per_month = sum(self.monthly_expenses.values())
+        total_monthly_expenses = total_expenses_per_month * self.months_till_graduation
+        total_big_expenses = sum(self.big_expenses.values())
+        return total_monthly_expenses + total_big_expenses
+
+    @property
+    def income_total(self): # gets the total monthly income and internship/vacation income from now till graduation
+        total_income_per_month = sum(self.monthly_income.values())
+        total_monthly_income = total_income_per_month * self.months_till_graduation
+        total_internship_vacation_income_per_month = sum(self.internship_vacation_income.values())
+        total_internship_vacation_income = total_internship_vacation_income_per_month * self.number_of_months_of_internships_and_vacations
+        return total_monthly_income + total_internship_vacation_income
 
     
