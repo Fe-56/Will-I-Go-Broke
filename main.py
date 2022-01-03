@@ -309,7 +309,11 @@ def check_internship_vacation_income_step(message):
     user = users[chat_id] 
 
     if user_input == 'Yes': # if the user states that the internship/vacation income are correct and all good
-        '''To continue with the next step of the calculation of all the incomes and the expenses'''
+        if user.i_will_go_broke: # if the user will go broke
+            bot.send_message(chat_id, f'You will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${user.amount_of_expense_to_cut_down} to not go broke!')
+
+        else: # if the user will not go broke
+            bot.send_message(chat_id, f'Congratulations! You will not go broke by the time you graduate in {user.graduation_date}!\n\nYou will even have ${user.bank_balance_remaining} to spare!')
 
     elif user_input == 'No': # if the user states that the monthly income are not correct
         user.internship_vacation_income.clear() # resets the dictionary containing the internship/vacation income

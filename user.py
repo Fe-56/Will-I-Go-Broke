@@ -42,7 +42,7 @@ class User:
         return self._school_fees_per_period
 
     @school_fees_per_period.setter
-    def graduation_date(self, value):
+    def school_fees_per_period(self, value):
         self._school_fees_per_period = value
 
     @property
@@ -124,4 +124,17 @@ class User:
         total_internship_vacation_income = total_internship_vacation_income_per_month * self.number_of_months_of_internships_and_vacations
         return total_monthly_income + total_internship_vacation_income
 
-    
+    @property
+    def i_will_go_broke(self): # gets a boolean on whether this User object will go broke or not by the time he graduates, based on his total expenses and income
+        change_in_bank_balance = self.income_total - self.expenses_total
+        return (self.current_bank_balance + change_in_bank_balance) <= 0 # returns a boolean
+
+    @property
+    def bank_balance_remaining(self): # returns the bank balance remaining if the user will not go broke
+        change_in_bank_balance = self.income_total - self.expenses_total
+        return self.current_bank_balance + change_in_bank_balance
+
+    @property
+    def amount_of_expense_to_cut_down(self): # returns the amount of expenses to be cut down in order not to go broke given the current income; the formula is the same as bank_balance_remaining, only difference is in the name of the computed property to avoid confusion
+        change_in_bank_balance = self.income_total - self.expenses_total
+        return self.current_bank_balance + change_in_bank_balance
