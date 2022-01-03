@@ -97,3 +97,28 @@ def get_income(input):
     income_name = input[:colon_index] # gets the name of the income
     income_amount = input[colon_index + 2:] # gets the amount of the income
     return income_name, float(income_amount)
+
+def print_summary(input):
+    printed_summary = f'Currrent bank balance: ${input.current_bank_balance}\n\nSchool Fees to pay\nTotal of ${input.expenses_total_school_fees_left_to_pay}, at ${input.school_fees_per_period} for {input.number_of_periods_to_pay_school_fees} terms/semesters/years\n\n\n'
+
+    printed_summary += f'Monthly Expenses for {input.months_till_graduation} month(s)\n'
+
+    for monthly_expense in input.monthly_expenses.keys():
+        printed_summary += f'{monthly_expense}: ${input.monthly_expenses[monthly_expense]}' + '\n'
+
+    printed_summary += '\n\nBig Expenses\n'
+
+    for big_expense in input.big_expenses.keys():
+        printed_summary += f'{big_expense}: ${input.big_expenses[big_expense]}' + '\n'
+
+    printed_summary += f'\n\nMonthly Income for {input.months_till_graduation} month(s)\n'
+
+    for monthly_income in input.monthly_income.keys():
+        printed_summary += f'{monthly_income}: ${input.monthly_income[monthly_income]}' + '\n'
+
+    printed_summary += f'\n\nInternship/Vacation Income for {input.number_of_months_of_internships_and_vacations} month(s)\n'
+
+    for internship_vacation_income in input.internship_vacation_income.keys():
+        printed_summary += f'{internship_vacation_income}: ${input.internship_vacation_income[internship_vacation_income]}' + '\n'
+
+    return printed_summary

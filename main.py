@@ -105,7 +105,7 @@ def number_of_periods_to_pay_school_fees_step(message):
 
     if not user_input.isdigit(): # if the user input is not an integer >= 0
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The number of terms/semester should be a positive number with no decimal places!', reply_markup = markup)
+        sent_message = bot.reply_to(message, 'The number of terms/semesters/years should be a positive number with no decimal places!', reply_markup = markup)
         bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
         return
 
@@ -310,9 +310,15 @@ def check_internship_vacation_income_step(message):
 
     if user_input == 'Yes': # if the user states that the internship/vacation income are correct and all good
         if user.i_will_go_broke: # if the user will go broke
-            bot.send_message(chat_id, f'You will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${user.amount_of_expense_to_cut_down} to not go broke!')
+            # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
+            printed_summary = print_summary(user)
+            bot.send_message(chat_id, printed_summary)
+            bot.send_message(chat_id, f'You will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${abs(user.amount_of_expense_to_cut_down)} to not go broke!')
 
         else: # if the user will not go broke
+            # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
+            printed_summary = print_summary(user)
+            bot.send_message(chat_id, printed_summary)
             bot.send_message(chat_id, f'Congratulations! You will not go broke by the time you graduate in {user.graduation_date}!\n\nYou will even have ${user.bank_balance_remaining} to spare!')
 
     elif user_input == 'No': # if the user states that the monthly income are not correct
