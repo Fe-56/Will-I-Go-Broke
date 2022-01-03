@@ -114,7 +114,7 @@ class User:
         total_expenses_per_month = sum(self.monthly_expenses.values())
         total_monthly_expenses = total_expenses_per_month * self.months_till_graduation
         total_big_expenses = sum(self.big_expenses.values())
-        return total_monthly_expenses + total_big_expenses
+        return total_monthly_expenses + total_big_expenses + self.expenses_total_school_fees_left_to_pay
 
     @property
     def income_total(self): # gets the total monthly income and internship/vacation income from now till graduation
