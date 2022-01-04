@@ -193,7 +193,56 @@ def big_expenses_step(message):
     sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your one-time big expenses?', reply_markup = markup)
     bot.register_next_step_handler(sent_message, check_big_expenses_step)
 
+'''In development'''
+
 def check_big_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    if user_input == 'Yes': # if the user states that the big expenses are correct and all good
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other expenses in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount to be paid in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. Hostel: 1000 for 3 terms\n\nOther expenses basically expenses that are not big one-time expeses, and are are also not expenses that you have to pay every month till graduation. Other expenses are expenses that you may have to pay for a certain number of months during your university life.' , reply_markup = markup) # ForceReply
+        bot.register_next_step_handler(sent_message, other_expenses_step)
+
+    elif user_input == 'No': # if the user states that the monthly expenses are not correct
+        user.big_expenses.clear() # resets the dictionary containing the big expenses
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.reply_to(message, 'Please input your big expenses again, one by one, in the format: Name: Amount (omit the dollar sign!)', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, big_expenses_step)
+
+def other_expenses_step(message):
+    user_input = message.text # gets the user input
+    chat_id = message.chat.id
+    user = users[chat_id] 
+
+    while user_input.lower() != 'done':
+        if is_valid_other_expense(user_input):
+            expense_name, expense_amount_number_of_periods = get_other_expense(user_input)
+            user.other_expenses[expense_name] = expense_amount_number_of_periods # stores the name and the amount of the other expenses in the dictionary in the user object instance
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input your next other expense! If you are done, please input done', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, other_expenses_step)
+            return
+
+        else:
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.reply_to(message, 'Please input a single big expense in the format: Name: Amount\n\n e.g. iPad: 1000\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
+            bot.register_next_step_handler(sent_message, big_expenses_step)
+            return
+
+    printed_big_expenses = ''
+
+    for expense in user.big_expenses.keys():
+        printed_big_expenses += f'{expense}: ${user.big_expenses[expense]}' + '\n'
+
+    bot.send_message(chat_id, printed_big_expenses) # sends a message containing all the big one-time expenses that the user inputted earlier on
+    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+    markup.add('Yes', 'No')
+    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your one-time big expenses?', reply_markup = markup)
+    bot.register_next_step_handler(sent_message, check_big_expenses_step)
+
+def check_other_expenses_step(message):
     user_input = message.text # gets the user input
     chat_id = message.chat.id
     user = users[chat_id] 

@@ -1,5 +1,8 @@
 # This file contains all the specific functions necessary for the /plan command
 
+from posixpath import split
+
+
 def is_valid_amount(input): # this function checks if input is a valid amount of money or not
     decimal_count = 0
 
@@ -70,6 +73,31 @@ def is_valid_expense(input): # this function checks if input is a valid (monthly
             return False
 
     return True
+
+def is_valid_other_expense(input): # this function checks if input is a valid other expense in the format: Name: Amount for x [period]
+    if (input.count(':') != 1) or (input.count('for') != 1) or (input.count(' ') != 4): # there must only be 4 spaces in the user input
+        return False
+
+    else:
+        colon_index = input.index(':')
+        for_index = input.index('for')
+
+        if (input[colon_index + 1] != ' ') or (input[for_index + 1] != ' '): # if the character right after the colon and the word for is not an empty space
+            return False
+
+        split_input = input.split(' ')
+
+        if (not is_valid_amount(split_input[1])) or (not split_input[3].isdigit()): # if there is not valid amount of money in the user input string or if there is not a valid number of periods in the user input string
+            return False
+
+        return True
+
+def get_other_expense(input):
+    colon_index = input.index(':') # gets the index of the colon, :
+    expense_name = input[:colon_index] # gets the name of the expense
+    expense_amount_number_of_periods = input[colon_index + 2:] # gets the 'Amount for x [period]'
+    expense_amount_number_of_periods = expense_amount_number_of_periods.split(' ')
+    return expense_name, expense_amount_number_of_periods
 
 def get_expense(input):
     colon_index = input.index(':') # gets the index of the colon, :

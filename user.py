@@ -9,6 +9,7 @@ class User:
         self._number_of_periods_to_pay_school_fees = 0
         self._monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
         self._big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
+        self._other_expenses = dict() # creates a dictionary to store the other expenses of the user, similar concept as the monthly expenses
         self._monthly_income = dict() # creates a dictionary to store the monthly income/allowance of the user, same concept as the monthly expenses
         self._number_of_months_of_internships_and_vacations = 0
         self._internship_vacation_income = dict() # creates a dictionary to store the monthly income of the user only during the internship/vacation periods
@@ -68,6 +69,14 @@ class User:
     @big_expenses.setter
     def big_expenses(self, value):
         self._big_expenses = value
+
+    @property
+    def other_expenses(self):
+        return self._other_expenses
+
+    @other_expenses.setter
+    def other_expenses(self, value):
+        self._other_expenses = value
 
     @property
     def monthly_income(self):
