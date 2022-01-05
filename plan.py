@@ -82,7 +82,7 @@ def is_valid_other_expense(input): # this function checks if input is a valid ot
         colon_index = input.index(':')
         for_index = input.index('for')
 
-        if (input[colon_index + 1] != ' ') or (input[for_index + 1] != ' '): # if the character right after the colon and the word for is not an empty space
+        if (input[colon_index + 1] != ' ') or (input[for_index + 3] != ' '): # if the character right after the colon and the word for is not an empty space
             return False
 
         split_input = input.split(' ')
@@ -96,7 +96,7 @@ def get_other_expense(input):
     colon_index = input.index(':') # gets the index of the colon, :
     expense_name = input[:colon_index] # gets the name of the expense
     expense_amount_number_of_periods = input[colon_index + 2:] # gets the 'Amount for x [period]'
-    expense_amount_number_of_periods = expense_amount_number_of_periods.split(' ')
+    expense_amount_number_of_periods = expense_amount_number_of_periods.split(' ') # so that this is a list [Amount, for, x, [period]]
     return expense_name, expense_amount_number_of_periods
 
 def get_expense(input):
