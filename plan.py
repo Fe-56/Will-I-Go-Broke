@@ -126,6 +126,31 @@ def get_income(input):
     income_amount = input[colon_index + 2:] # gets the amount of the income
     return income_name, float(income_amount)
 
+def is_valid_other_income(input): # this function checks if input is a valid other income in the format: Name: Amount for x [period]
+    if (input.count(':') != 1) or (input.count('for') != 1) or (input.count(' ') != 4): # there must only be 4 spaces in the user input
+        return False
+
+    else:
+        colon_index = input.index(':')
+        for_index = input.index('for')
+
+        if (input[colon_index + 1] != ' ') or (input[for_index + 3] != ' '): # if the character right after the colon and the word for is not an empty space
+            return False
+
+        split_input = input.split(' ')
+
+        if (not is_valid_amount(split_input[1])) or (not split_input[3].isdigit()): # if there is not valid amount of money in the user input string or if there is not a valid number of periods in the user input string
+            return False
+
+        return True
+
+def get_other_income(input):
+    colon_index = input.index(':') # gets the index of the colon, :
+    income_name = input[:colon_index] # gets the name of the income
+    income_amount_number_of_periods = input[colon_index + 2:] # gets the 'Amount for x [period]'
+    income_amount_number_of_periods = income_amount_number_of_periods.split(' ') # so that this is a list [Amount, for, x, [period]]
+    return income_name, income_amount_number_of_periods
+
 def print_summary(input):
     printed_summary = f'Currrent bank balance: ${input.current_bank_balance}\n\nSchool Fees to pay\nTotal of ${input.expenses_total_school_fees_left_to_pay}, at ${input.school_fees_per_period} for {input.number_of_periods_to_pay_school_fees} terms/semesters/years\n\n\n'
 
@@ -139,6 +164,11 @@ def print_summary(input):
     for big_expense in input.big_expenses.keys():
         printed_summary += f'{big_expense}: ${input.big_expenses[big_expense]}' + '\n'
 
+    printed_summary += '\n\nOther Expenses\n'
+
+    for other_expense in input.other_expenses.keys():
+        printed_summary += f'{other_expense}: ${input.other_expenses[other_expense][0]} for {input.other_expenses[other_expense][2]} {input.other_expenses[other_expense][3]}' + '\n'
+
     printed_summary += f'\n\nMonthly Income for {input.months_till_graduation} month(s)\n'
 
     for monthly_income in input.monthly_income.keys():
@@ -148,5 +178,10 @@ def print_summary(input):
 
     for internship_vacation_income in input.internship_vacation_income.keys():
         printed_summary += f'{internship_vacation_income}: ${input.internship_vacation_income[internship_vacation_income]}' + '\n'
+
+    printed_summary += '\n\nOther Income\n'
+
+    for other_income in input.other_income.keys():
+        printed_summary += f'{other_income}: ${input.other_income[other_income][0]} for {input.other_income[other_income][2]} {input.other_income[other_income][3]}' + '\n'
 
     return printed_summary

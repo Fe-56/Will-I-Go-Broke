@@ -9,10 +9,11 @@ class User:
         self._number_of_periods_to_pay_school_fees = 0
         self._monthly_expenses = dict() # creates a dictionary to store the monthly expenses of the user, where the keys are the name of the expenses and the values are the amount of the expenses
         self._big_expenses = dict() # creates a dictionary to store the one-time big expenses of the user, similar concept as the monthly expenses
-        self._other_expenses = dict() # creates a dictionary to store the other expenses of the user, similar concept as the monthly expenses
+        self._other_expenses = dict() # creates a dictionary to store the other expenses of the user, where they are not the school fees, not monthly expenses and not one-time big expenses, but are expenses that they may have to spend for a certain number of periods; this gives them flexibility to input a wider range of expenses
         self._monthly_income = dict() # creates a dictionary to store the monthly income/allowance of the user, same concept as the monthly expenses
         self._number_of_months_of_internships_and_vacations = 0
         self._internship_vacation_income = dict() # creates a dictionary to store the monthly income of the user only during the internship/vacation periods
+        self._other_income = dict() # creates a dictionary to store the other income of the user, where they are not the monthly income/allowance of the user, they are also not the monthly internship/vacation income of the user, but they are the income that the user will earn/get for a certain period of time, nad this gives them flexibility to input a wider range of income
 
     @property
     def name(self):
@@ -103,6 +104,14 @@ class User:
         self._internship_vacation_income = value
 
     @property
+    def other_income(self):
+        return self._other_income
+
+    @other_income.setter
+    def other_income(self, value):
+        self._other_income = value
+
+    @property
     def months_till_graduation(self): # calculates the amount of time in months between the current time and the graduation month and year
         from datetime import datetime
         current_month = datetime.now().month # gets the current month
@@ -119,11 +128,31 @@ class User:
         return self.school_fees_per_period * self.number_of_periods_to_pay_school_fees
 
     @property
+    def expenses_total_other_expenses(self): # gets the total amount of other expenses that the user needs to pay
+        output = 0
+
+        for expense in self.other_expenses.values(): # where expense will be a list [Amount, for, x, [period]]
+            amount = float(expense[0]) * int(expense[2]) # expense[0] is the amount, expense[2] is x
+            output += amount
+
+        return output
+
+    @property
     def expenses_total(self): # gets the total monthly expenses and big one-time expenses from now till graduation
         total_expenses_per_month = sum(self.monthly_expenses.values())
         total_monthly_expenses = total_expenses_per_month * self.months_till_graduation
         total_big_expenses = sum(self.big_expenses.values())
-        return total_monthly_expenses + total_big_expenses + self.expenses_total_school_fees_left_to_pay
+        return total_monthly_expenses + total_big_expenses + self.expenses_total_school_fees_left_to_pay + self.expenses_total_other_expenses
+
+    @property
+    def income_total_other_income(self): # gets the total amount of other income that the user will earn/get
+        output = 0
+
+        for income in self.other_income.values(): # where income will be a list [Amount, for, x, [period]]
+            amount = float(income[0]) * int(income[2]) # income[0] is the amount, income[2] is x
+            output += amount
+
+        return output
 
     @property
     def income_total(self): # gets the total monthly income and internship/vacation income from now till graduation
@@ -131,7 +160,7 @@ class User:
         total_monthly_income = total_income_per_month * self.months_till_graduation
         total_internship_vacation_income_per_month = sum(self.internship_vacation_income.values())
         total_internship_vacation_income = total_internship_vacation_income_per_month * self.number_of_months_of_internships_and_vacations
-        return total_monthly_income + total_internship_vacation_income
+        return total_monthly_income + total_internship_vacation_income + self.income_total_other_income
 
     @property
     def i_will_go_broke(self): # gets a boolean on whether this User object will go broke or not by the time he graduates, based on his total expenses and income

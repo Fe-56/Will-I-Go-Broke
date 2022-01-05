@@ -4,3 +4,4 @@
 /disclaimer - Sends a list of all the disclaimers that you should take note while using this bot
 /plan - The main function of this bot that helps you map and plan your finances
 /feedback - Sends you a link to a Google Form to fill in your feedback or suggestions about this bot
+/githubrepo - Provides a link to the GitHub repository for the code of this bot
