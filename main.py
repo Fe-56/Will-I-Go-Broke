@@ -80,24 +80,34 @@ def graduation_date_step(message):
     user = users[chat_id] # gets the user object instance from the users dictionary
     user.graduation_date = user_input
     markup = types.ForceReply(selective = False) # for a ForceReply
-    sent_message = bot.send_message(chat_id, 'How much are your school fees per term/semester/year? Include things like tuition fees, and any other compulsory school fees. Please omit the dollar sign.', reply_markup = markup) # ForceReply
+    sent_message = bot.send_message(chat_id, 'How much are your school fees per term/semester/year? Include things like tuition fees, and any other compulsory school fees. Please omit the dollar sign.\n\nPlease input none if you do not need to pay anymore school fees.', reply_markup = markup) # ForceReply
     bot.register_next_step_handler(sent_message, school_fees_per_period_step)
 
 def school_fees_per_period_step(message):
     user_input = message.text # gets the user input
     chat_id = message.chat.id
 
-    if not is_valid_amount(user_input): # if the user input is not a valid amount of money
+    if (is_valid_amount(user_input)) or (user_input.lower() == 'none'): # if the user input is a valid amount of money or none
+        user = users[chat_id]
+
+        if user_input.lower() == 'none': # move to the monthly expenses step since the user does not need to pay any school fees
+            user.school_fees_per_period_step = float(0)
+            user.number_of_periods_to_pay_school_fees = 0
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, f'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, monthly_expenses_step)
+
+        else:
+            user.school_fees_per_period = float(user_input)
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, f'For how many more terms/semesters/years do you have to pay the school fees at ${user.school_fees_per_period} per term/semester/year?', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
+
+    elif (not is_valid_amount(user_input)): # if the user input is not a valid amount of money
         markup = types.ForceReply(selective = False) # for a ForceReply
         sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nThe school fees should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, school_fees_per_period_step)
         return
-
-    user = users[chat_id]
-    user.school_fees_per_period = float(user_input)
-    markup = types.ForceReply(selective = False) # for a ForceReply
-    sent_message = bot.send_message(chat_id, f'For how many more terms/semesters/years do you have to pay the school fees at ${user.school_fees_per_period} per term/semester/year? Please put 0 if you have finished paying all the school fees until graduation!', reply_markup = markup) # ForceReply
-    bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
 
 def number_of_periods_to_pay_school_fees_step(message):
     user_input = message.text # gets the user input
