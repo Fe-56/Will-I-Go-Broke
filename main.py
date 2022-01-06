@@ -57,7 +57,7 @@ def current_bank_balance_step(message):
 
     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The initial bank balance should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup)
+        sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nThe initial bank balance should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, current_bank_balance_step)
         return
 
@@ -73,7 +73,7 @@ def graduation_date_step(message):
 
     if not is_valid_date(user_input): # if the user input is not a valid date in the format: MM/YYYY
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The expected graduation date should only consists of digits in the format: MM/YYYY, and must be at least in the following month of the current month!', reply_markup = markup)
+        sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nThe expected graduation date should only consists of digits in the format: MM/YYYY, and must be at least in the following month of the current month!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, graduation_date_step)
         return
 
@@ -89,7 +89,7 @@ def school_fees_per_period_step(message):
 
     if not is_valid_amount(user_input): # if the user input is not a valid amount of money
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The school fees should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup)
+        sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nThe school fees should only consist of digits and a maximum of one decmial point and be a positive value!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, school_fees_per_period_step)
         return
 
@@ -105,7 +105,7 @@ def number_of_periods_to_pay_school_fees_step(message):
 
     if not user_input.isdigit(): # if the user input is not an integer >= 0
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The number of terms/semesters/years should be a positive number with no decimal places!', reply_markup = markup)
+        sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nThe number of terms/semesters/years should be a positive number with no decimal places!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, number_of_periods_to_pay_school_fees_step)
         return
 
@@ -131,7 +131,7 @@ def monthly_expenses_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single monthly expense in the format: Name: Amount\n\n e.g. Spotify subscription: 4\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
 
@@ -153,7 +153,7 @@ def check_monthly_expenses_step(message):
 
     if user_input == 'Yes': # if the user states that the monthly expenses are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Laptop: 2000', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\ne.g. Laptop: 2000', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, big_expenses_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
@@ -178,7 +178,7 @@ def big_expenses_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single big expense in the format: Name: Amount\n\n e.g. iPad: 1000\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single big expense in the format: Name: Amount\n\n e.g. iPad: 1000\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, big_expenses_step)
             return
 
@@ -225,7 +225,7 @@ def other_expenses_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single other expense in the format: Name: Amount for x [period]\n\n e.g. Gym_Membership: 200 for 6 months\n\n Where there is no spaces in the name of the other expense, there should be 2 numbers', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single other expense in the format: Name: Amount for x [period]\n\n e.g. Gym_Membership: 200 for 6 months\n\n Where there is no spaces in the name of the other expense, there should be 2 numbers', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, other_expenses_step)
             return
 
@@ -272,7 +272,7 @@ def monthly_income_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single source of monthly income/allowance in the format: Name: Amount\n\n e.g. Salary from freelance design job: 1000\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single source of monthly income/allowance in the format: Name: Amount\n\n e.g. Salary from freelance design job: 1000\n\n Where there is at most 1 number (positive)and 1 colon', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, monthly_income_step)
             return
 
@@ -309,7 +309,7 @@ def number_of_months_of_internships_and_vacations_step(message):
 
     if not user_input.isdigit(): # if the user input is not an integer >= 0
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.reply_to(message, 'The number of months of internships/vacations should be a positive number with no decimal places!', reply_markup = markup)
+        sent_message = bot.reply_to(message, '<b>ERORR!</b>\n\nThe number of months of internships/vacations should be a positive number with no decimal places!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
         return
 
@@ -335,7 +335,7 @@ def internship_vacation_income_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single source of monthly internship/vacation income in the format: Name: Amount\n\n e.g. Waiter part time vacation job: 1800\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single source of monthly internship/vacation income in the format: Name: Amount\n\n e.g. Waiter part time vacation job: 1800\n\n Where there is at most 1 number (positive) and 1 colon', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, internship_vacation_income_step)
             return
 
@@ -382,7 +382,7 @@ def other_income_step(message):
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.reply_to(message, 'Please input a single other income in the format: Name: Amount for x [period]\n\n e.g. Tuition_Salary: 400 for 6 months\n\n Where there is no spaces in the name of the other income, there should be 2 numbers', reply_markup = markup)
+            sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single other income in the format: Name: Amount for x [period]\n\n e.g. Tuition_Salary: 400 for 6 months\n\n Where there is no spaces in the name of the other income, there should be 2 numbers', reply_markup = markup, parse_mode = 'HTML')
             bot.register_next_step_handler(sent_message, other_income_step)
             return
 
@@ -406,14 +406,14 @@ def check_other_income_step(message):
         if user.i_will_go_broke: # if the user will go broke
             # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
             printed_summary = print_summary(user)
-            bot.send_message(chat_id, printed_summary)
-            bot.send_message(chat_id, f'You will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${abs(user.amount_of_expense_to_cut_down)} to not go broke!')
+            bot.send_message(chat_id, printed_summary, parse_mode = 'HTML')
+            bot.send_message(chat_id, f'<b>OH NO!</b>\n\nYou will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${abs(user.amount_of_expense_to_cut_down)} to not go broke!', parse_mode = 'HTML')
 
         else: # if the user will not go broke
             # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
             printed_summary = print_summary(user)
-            bot.send_message(chat_id, printed_summary)
-            bot.send_message(chat_id, f'Congratulations! You will not go broke by the time you graduate in {user.graduation_date}!\n\nYou will even have ${user.bank_balance_remaining} to spare!')
+            bot.send_message(chat_id, printed_summary, parse_mode = 'HTML')
+            bot.send_message(chat_id, f'<b>CONGRATULATIONS!</b>\n\nYou will not go broke by the time you graduate in {user.graduation_date}!\n\nYou will even have ${user.bank_balance_remaining} to spare!', parse_mode = 'HTML')
 
     elif user_input == 'No': # if the user states that the monthly income are not correct
         user.other_income.clear() # resets the dictionary containing the other income
