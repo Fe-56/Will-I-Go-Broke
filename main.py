@@ -94,7 +94,7 @@ def school_fees_per_period_step(message):
             user.school_fees_per_period_step = float(0)
             user.number_of_periods_to_pay_school_fees = 0
             markup = types.ForceReply(selective = False) # for a ForceReply
-            sent_message = bot.send_message(chat_id, f'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300', reply_markup = markup) # ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300\n\nPlease input none if you do not have/foresee any monthly expenses', reply_markup = markup) # ForceReply
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
 
         else:
@@ -122,7 +122,7 @@ def number_of_periods_to_pay_school_fees_step(message):
     user = users[chat_id]
     user.number_of_periods_to_pay_school_fees = int(user_input)
     markup = types.ForceReply(selective = False) # for a ForceReply
-    sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300', reply_markup = markup) # ForceReply
+    sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly expenses in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Food: 300\n\nPlease input none if you do not have/foresee any monthly expenses', reply_markup = markup) # ForceReply
     bot.register_next_step_handler(sent_message, monthly_expenses_step)
 
 def monthly_expenses_step(message):
@@ -130,7 +130,7 @@ def monthly_expenses_step(message):
     chat_id = message.chat.id
     user = users[chat_id] 
 
-    while user_input.lower() != 'done':
+    while (user_input.lower() != 'done'):
         if is_valid_expense(user_input):
             expense_name, expense_amount = get_expense(user_input)
             user.monthly_expenses[expense_name] = expense_amount # stores the name and the amount of the monthly expenses in the dictionary in the user object instance
@@ -138,6 +138,12 @@ def monthly_expenses_step(message):
             sent_message = bot.send_message(chat_id, 'Please input your next monthly expense! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
+
+        elif user_input.lower() == 'none': # if the user has no monthly expenses, move on to big expenses step
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\ne.g. Laptop: 2000\n\nPlease input none if you do not have/foresee any one-time big expenses', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, big_expenses_step)
+            break
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
@@ -163,7 +169,7 @@ def check_monthly_expenses_step(message):
 
     if user_input == 'Yes': # if the user states that the monthly expenses are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\ne.g. Laptop: 2000', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\ne.g. Laptop: 2000\n\nPlease input none if you do not have/foresee any one-time big expenses', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, big_expenses_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
@@ -177,7 +183,7 @@ def big_expenses_step(message):
     chat_id = message.chat.id
     user = users[chat_id] 
 
-    while user_input.lower() != 'done':
+    while (user_input.lower() != 'done'):
         if is_valid_expense(user_input):
             expense_name, expense_amount = get_expense(user_input)
             user.big_expenses[expense_name] = expense_amount # stores the name and the amount of the big expenses in the dictionary in the user object instance
@@ -185,6 +191,12 @@ def big_expenses_step(message):
             sent_message = bot.send_message(chat_id, 'Please input your next big expense! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, big_expenses_step)
             return
+
+        elif user_input.lower() == 'none': # if the user has no one-time big expenses, move on to the other expenses step
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other expenses in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount to be paid in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. Hostel: 1000 for 3 terms\n\nOther expenses are basically expenses that are not big one-time expeses, and are are also not expenses that you have to pay every month till graduation. Other expenses are expenses that you may have to pay for a certain number of months/periods during your university life.\n\nPlease input none if you have no other expenses.', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, other_expenses_step)
+            break
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
@@ -210,7 +222,7 @@ def check_big_expenses_step(message):
 
     if user_input == 'Yes': # if the user states that the big expenses are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other expenses in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount to be paid in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. Hostel: 1000 for 3 terms\n\nOther expenses are basically expenses that are not big one-time expeses, and are are also not expenses that you have to pay every month till graduation. Other expenses are expenses that you may have to pay for a certain number of months/periods during your university life.', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other expenses in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount to be paid in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. Hostel: 1000 for 3 terms\n\nOther expenses are basically expenses that are not big one-time expeses, and are are also not expenses that you have to pay every month till graduation. Other expenses are expenses that you may have to pay for a certain number of months/periods during your university life.\n\nPlease input none if you have no other expenses.', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, other_expenses_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
