@@ -245,6 +245,12 @@ def other_expenses_step(message):
             bot.register_next_step_handler(sent_message, other_expenses_step)
             return
 
+        elif user_input.lower() == 'none': # if the user has no other expenses, move on to the monthly income step
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Allowance from parents: 200\n\n NOTE: Whatever you input here should be the income/allowance that you are EXPECTED TO GET EVERY SINGLE MONTH till graduation and does not depend on whether it is during any vacation or internship or not!\n\nPlease input none if you do not have any monthly income/allowance.', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, monthly_income_step)
+            break
+
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.reply_to(message, '<b>ERROR!</b>\n\nPlease input a single other expense in the format: Name: Amount for x [period]\n\n e.g. Gym_Membership: 200 for 6 months\n\n Where there is no spaces in the name of the other expense, there should be 2 numbers', reply_markup = markup, parse_mode = 'HTML')
@@ -269,7 +275,7 @@ def check_other_expenses_step(message):
 
     if user_input == 'Yes': # if the user states that the big expenses are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Allowance from parents: 200\n\n NOTE: Whatever you input here should be the income/allowance that you are EXPECTED TO GET EVERY SINGLE MONTH till graduation and does not depend on whether it is during any vacation or internship or not!', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Allowance from parents: 200\n\n NOTE: Whatever you input here should be the income/allowance that you are EXPECTED TO GET EVERY SINGLE MONTH till graduation and does not depend on whether it is during any vacation or internship or not!\n\nPlease input none if you do not have any monthly income/allowance.', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, monthly_income_step)
 
     elif user_input == 'No': # if the user states that the monthly expenses are not correct
@@ -291,6 +297,12 @@ def monthly_income_step(message):
             sent_message = bot.send_message(chat_id, 'Please input your next monthly income/allowance source! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, monthly_income_step)
             return
+
+        elif user_input.lower() == 'none': # if the user has no monthly income, move on to the number of months of internship/vacation step
+            markup = types.ForceReply(selective = False) # for a ForceReply
+            sent_message = bot.send_message(chat_id, 'Please input the total number of months of internships/vacations that you have from now till graduation\n\nPlease input none if you are not expecting to have any internships/vacations at all', reply_markup = markup) # ForceReply
+            bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
+            break
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
@@ -316,7 +328,7 @@ def check_monthly_income_step(message):
 
     if user_input == 'Yes': # if the user states that the monthly income are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input the total number of months of internships/vacations that you have from now till graduation', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input the total number of months of internships/vacations that you have from now till graduation\n\nPlease input none if you are not expecting to have any internships/vacations at all', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
 
     elif user_input == 'No': # if the user states that the monthly income are not correct
@@ -328,14 +340,20 @@ def check_monthly_income_step(message):
 def number_of_months_of_internships_and_vacations_step(message):
     user_input = message.text # gets the user input
     chat_id = message.chat.id
+    user = users[chat_id]
 
-    if not user_input.isdigit(): # if the user input is not an integer >= 0
+    if user_input.lower() == 'none': # if the user input is none, move on to the other income step
+        user.number_of_months_of_internships_and_vacations = 0
+        markup = types.ForceReply(selective = False) # for a ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other income in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount of income in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. GrabFood_Salary: 1500 for 3 months\n\nOther income are basically income that are not monthly income/allowance that you will receive every month, and are also not the income that you will receive only during internship/vacation period. Other income refer to income that you will receive for a certain number of months/periods during your university life.\n\nPlease input none if you are not expecting to have other income at all', reply_markup = markup) # ForceReply
+        bot.register_next_step_handler(sent_message, other_income_step)
+
+    elif not user_input.isdigit(): # if the user input is not an integer >= 0
         markup = types.ForceReply(selective = False) # for a ForceReply
         sent_message = bot.reply_to(message, '<b>ERORR!</b>\n\nThe number of months of internships/vacations should be a positive number with no decimal places!', reply_markup = markup, parse_mode = 'HTML')
         bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
         return
 
-    user = users[chat_id]
     user.number_of_months_of_internships_and_vacations = int(user_input)
     markup = types.ForceReply(selective = False) # for a ForceReply
     sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income during internship/vacation period in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Internship salary: 1500', reply_markup = markup) # ForceReply
@@ -379,7 +397,7 @@ def check_internship_vacation_income_step(message):
 
     if user_input == 'Yes': # if the user states that the monthly internship/vacation income are correct and all good
         markup = types.ForceReply(selective = False) # for a ForceReply
-        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other income in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount of income in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. GrabFood_Salary: 1500 for 3 months\n\nOther income are basically income that are not monthly income/allowance that you will receive every month, and are also not the income that you will receive only during internship/vacation period. Other income refer to income that you will receive for a certain number of months/periods during your university life.', reply_markup = markup) # ForceReply
+        sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other income in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount of income in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. GrabFood_Salary: 1500 for 3 months\n\nOther income are basically income that are not monthly income/allowance that you will receive every month, and are also not the income that you will receive only during internship/vacation period. Other income refer to income that you will receive for a certain number of months/periods during your university life.\n\nPlease input none if you are not expecting to have other income at all', reply_markup = markup) # ForceReply
         bot.register_next_step_handler(sent_message, other_income_step)
 
     elif user_input == 'No': # if the user states that the monthly income are not correct
@@ -401,6 +419,21 @@ def other_income_step(message):
             sent_message = bot.send_message(chat_id, 'Please input your next other income! If you are done, please input done', reply_markup = markup)
             bot.register_next_step_handler(sent_message, other_income_step)
             return
+
+        elif user_input.lower() == 'none': # if the user has no other income, show the summary message
+            if user.i_will_go_broke: # if the user will go broke
+            # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
+                printed_summary = print_summary(user)
+                bot.send_message(chat_id, printed_summary, parse_mode = 'HTML')
+                bot.send_message(chat_id, f'<b>OH NO!</b>\n\nYou will go broke by the time you graduate in {user.graduation_date}!\n\nYou will need to cut down your total expenses by ${abs(user.amount_of_expense_to_cut_down)} to not go broke!', parse_mode = 'HTML')
+
+            else: # if the user will not go broke
+            # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
+                printed_summary = print_summary(user)
+                bot.send_message(chat_id, printed_summary, parse_mode = 'HTML')
+                bot.send_message(chat_id, f'<b>CONGRATULATIONS!</b>\n\nYou will not go broke by the time you graduate in {user.graduation_date}!\n\nYou will even have ${user.bank_balance_remaining} to spare!', parse_mode = 'HTML')
+
+            break
 
         else:
             markup = types.ForceReply(selective = False) # for a ForceReply
