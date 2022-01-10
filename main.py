@@ -140,6 +140,7 @@ def monthly_expenses_step(message):
             return
 
         elif user_input.lower() == 'none': # if the user has no monthly expenses, move on to big expenses step
+            user.monthly_expenses.clear()
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected one-time big expenses in the format: Name: Amount (omit the dollar sign!)\n\ne.g. Laptop: 2000\n\nPlease input none if you do not have/foresee any one-time big expenses', reply_markup = markup) # ForceReply
             bot.register_next_step_handler(sent_message, big_expenses_step)
@@ -151,16 +152,17 @@ def monthly_expenses_step(message):
             bot.register_next_step_handler(sent_message, monthly_expenses_step)
             return
 
-    printed_monthly_expenses = ''
+    if len(user.monthly_expenses) != 0: # if the user previously inputted monthly expense(s); this is to solve the problem of the user inputting none even after he has already inputted monthly expense(s) previously, resulting in the showing the monthly expenses and going to the big expenses step in the same step
+        printed_monthly_expenses = ''
 
-    for expense in user.monthly_expenses.keys():
-        printed_monthly_expenses += f'{expense}: ${user.monthly_expenses[expense]}' + '\n'
+        for expense in user.monthly_expenses.keys():
+            printed_monthly_expenses += f'{expense}: ${user.monthly_expenses[expense]}' + '\n'
 
-    bot.send_message(chat_id, printed_monthly_expenses) # sends a message containing all the monthly expenses that the user inputted earlier on
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
-    markup.add('Yes', 'No')
-    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly expenses?', reply_markup = markup)
-    bot.register_next_step_handler(sent_message, check_monthly_expenses_step)
+        bot.send_message(chat_id, printed_monthly_expenses) # sends a message containing all the monthly expenses that the user inputted earlier on
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+        markup.add('Yes', 'No')
+        sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly expenses?', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, check_monthly_expenses_step)
 
 def check_monthly_expenses_step(message):
     user_input = message.text # gets the user input
@@ -193,6 +195,7 @@ def big_expenses_step(message):
             return
 
         elif user_input.lower() == 'none': # if the user has no one-time big expenses, move on to the other expenses step
+            user.big_expenses.clear()
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected other expenses in the following format: Name: Amount for x [period]\n\nWhere name should be a single word with no spaces, where amount is the amount to be paid in a single [period], where a [period] can be a month, semester, term, etc., just need to write down a single word in place of the [period], x is a number and omit the dollar sign. E.g. Hostel: 1000 for 3 terms\n\nOther expenses are basically expenses that are not big one-time expeses, and are are also not expenses that you have to pay every month till graduation. Other expenses are expenses that you may have to pay for a certain number of months/periods during your university life.\n\nPlease input none if you have no other expenses.', reply_markup = markup) # ForceReply
             bot.register_next_step_handler(sent_message, other_expenses_step)
@@ -204,16 +207,17 @@ def big_expenses_step(message):
             bot.register_next_step_handler(sent_message, big_expenses_step)
             return
 
-    printed_big_expenses = ''
+    if len(user.big_expenses) != 0: # if the user previously inputted big expense(s); this is to solve the problem of the user inputting none even after he has already inputted big expense(s) previously, resulting in the showing the big expenses and going to the other expenses step in the same step
+        printed_big_expenses = ''
 
-    for expense in user.big_expenses.keys():
-        printed_big_expenses += f'{expense}: ${user.big_expenses[expense]}' + '\n'
+        for expense in user.big_expenses.keys():
+            printed_big_expenses += f'{expense}: ${user.big_expenses[expense]}' + '\n'
 
-    bot.send_message(chat_id, printed_big_expenses) # sends a message containing all the big one-time expenses that the user inputted earlier on
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
-    markup.add('Yes', 'No')
-    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your one-time big expenses?', reply_markup = markup)
-    bot.register_next_step_handler(sent_message, check_big_expenses_step)
+        bot.send_message(chat_id, printed_big_expenses) # sends a message containing all the big one-time expenses that the user inputted earlier on
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+        markup.add('Yes', 'No')
+        sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your one-time big expenses?', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, check_big_expenses_step)
 
 def check_big_expenses_step(message):
     user_input = message.text # gets the user input
@@ -246,6 +250,7 @@ def other_expenses_step(message):
             return
 
         elif user_input.lower() == 'none': # if the user has no other expenses, move on to the monthly income step
+            user.other_expenses.clear()
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input, one by one, your expected monthly income/allowance in the format: Name: Amount (omit the dollar sign!)\n\n e.g. Allowance from parents: 200\n\n NOTE: Whatever you input here should be the income/allowance that you are EXPECTED TO GET EVERY SINGLE MONTH till graduation and does not depend on whether it is during any vacation or internship or not!\n\nPlease input none if you do not have any monthly income/allowance.', reply_markup = markup) # ForceReply
             bot.register_next_step_handler(sent_message, monthly_income_step)
@@ -257,16 +262,17 @@ def other_expenses_step(message):
             bot.register_next_step_handler(sent_message, other_expenses_step)
             return
 
-    printed_other_expenses = ''
+    if len(user.other_expenses) != 0: # if the user previously inputted other expense(s); this is to solve the problem of the user inputting none even after he has already inputted other expense(s) previously, resulting in the showing the other expenses and going to the monthly income step in the same step
+        printed_other_expenses = ''
 
-    for expense in user.other_expenses.keys():
-        printed_other_expenses += f'{expense}: ${user.other_expenses[expense][0]} for {user.other_expenses[expense][2]} {user.other_expenses[expense][3]}' + '\n' # where {user.other_expenses[expense][0]} is the amount per period, {user.other_expenses[expense][1]} is the number of periods and {user.other_expenses[expense][2]} is the unit of the period
+        for expense in user.other_expenses.keys():
+            printed_other_expenses += f'{expense}: ${user.other_expenses[expense][0]} for {user.other_expenses[expense][2]} {user.other_expenses[expense][3]}' + '\n' # where {user.other_expenses[expense][0]} is the amount per period, {user.other_expenses[expense][1]} is the number of periods and {user.other_expenses[expense][2]} is the unit of the period
 
-    bot.send_message(chat_id, printed_other_expenses) # sends a message containing all the other expenses that the user inputted earlier on
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
-    markup.add('Yes', 'No')
-    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your other expenses? Please double check and confirm the amount, as well as the number of periods that this amount will be paid during/multiplied by!', reply_markup = markup)
-    bot.register_next_step_handler(sent_message, check_other_expenses_step)
+        bot.send_message(chat_id, printed_other_expenses) # sends a message containing all the other expenses that the user inputted earlier on
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+        markup.add('Yes', 'No')
+        sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your other expenses? Please double check and confirm the amount, as well as the number of periods that this amount will be paid during/multiplied by!', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, check_other_expenses_step)
 
 def check_other_expenses_step(message):
     user_input = message.text # gets the user input
@@ -299,6 +305,7 @@ def monthly_income_step(message):
             return
 
         elif user_input.lower() == 'none': # if the user has no monthly income, move on to the number of months of internship/vacation step
+            user.monthly_income.clear()
             markup = types.ForceReply(selective = False) # for a ForceReply
             sent_message = bot.send_message(chat_id, 'Please input the total number of months of internships/vacations that you have from now till graduation\n\nPlease input none if you are not expecting to have any internships/vacations at all', reply_markup = markup) # ForceReply
             bot.register_next_step_handler(sent_message, number_of_months_of_internships_and_vacations_step)
@@ -310,16 +317,17 @@ def monthly_income_step(message):
             bot.register_next_step_handler(sent_message, monthly_income_step)
             return
 
-    printed_monthly_income = ''
+    if len(user.montly_income) != 0: # if the user previously inputted monthly income(s); this is to solve the problem of the user inputting none even after he has already inputted monthly income(s) previously, resulting in the showing the monthly income and going to the number of months of internship/vacation step in the same step
+        printed_monthly_income = ''
 
-    for income in user.monthly_income.keys():
-        printed_monthly_income += f'{income}: ${user.monthly_income[income]}' + '\n'
+        for income in user.monthly_income.keys():
+            printed_monthly_income += f'{income}: ${user.monthly_income[income]}' + '\n'
 
-    bot.send_message(chat_id, printed_monthly_income) # sends a message containing all the monthly income that the user inputted earlier on
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
-    markup.add('Yes', 'No')
-    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly income/allowance sources?', reply_markup = markup)
-    bot.register_next_step_handler(sent_message, check_monthly_income_step)
+        bot.send_message(chat_id, printed_monthly_income) # sends a message containing all the monthly income that the user inputted earlier on
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+        markup.add('Yes', 'No')
+        sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your monthly income/allowance sources?', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, check_monthly_income_step)
 
 def check_monthly_income_step(message):
     user_input = message.text # gets the user input
@@ -421,6 +429,8 @@ def other_income_step(message):
             return
 
         elif user_input.lower() == 'none': # if the user has no other income, show the summary message
+            user.other_income.clear()
+
             if user.i_will_go_broke: # if the user will go broke
             # to create a string such that the bot will send a message that shows the summary of the user's income and expense during his university life
                 printed_summary = print_summary(user)
@@ -441,16 +451,17 @@ def other_income_step(message):
             bot.register_next_step_handler(sent_message, other_income_step)
             return
 
-    printed_other_income = ''
+    if len(user.other_income) != 0: # if the user previously inputted other income(s); this is to solve the problem of the user inputting none even after he has already inputted other income(s) previously, resulting in the showing the other income and going to the next step in the same step
+        printed_other_income = ''
 
-    for income in user.other_income.keys():
-        printed_other_income += f'{income}: ${user.other_income[income][0]} for {user.other_income[income][2]} {user.other_income[income][3]}' + '\n' # where {user.other_income[income][0]} is the amount per period, {user.other_income[income][1]} is the number of periods and {user.other_expenses[income][2]} is the unit of the period
+        for income in user.other_income.keys():
+            printed_other_income += f'{income}: ${user.other_income[income][0]} for {user.other_income[income][2]} {user.other_income[income][3]}' + '\n' # where {user.other_income[income][0]} is the amount per period, {user.other_income[income][1]} is the number of periods and {user.other_expenses[income][2]} is the unit of the period
 
-    bot.send_message(chat_id, printed_other_income) # sends a message containing all the other income that the user inputted earlier on
-    markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
-    markup.add('Yes', 'No')
-    sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your other income? Please double check and confirm the amount, as well as the number of periods that this amount will be paid during/multiplied by!', reply_markup = markup)
-    bot.register_next_step_handler(sent_message, check_other_income_step)
+        bot.send_message(chat_id, printed_other_income) # sends a message containing all the other income that the user inputted earlier on
+        markup = types.ReplyKeyboardMarkup(one_time_keyboard = True) # multiple choice reply
+        markup.add('Yes', 'No')
+        sent_message = bot.send_message(chat_id, 'Does the message above correctly display all your other income? Please double check and confirm the amount, as well as the number of periods that this amount will be paid during/multiplied by!', reply_markup = markup)
+        bot.register_next_step_handler(sent_message, check_other_income_step)
 
 def check_other_income_step(message):
     user_input = message.text # gets the user input
