@@ -1,7 +1,5 @@
 # This file contains all the specific functions necessary for the /plan command
 
-from posixpath import split
-
 def is_valid_amount(input): # this function checks if input is a valid amount of money or not
     decimal_count = 0
 
