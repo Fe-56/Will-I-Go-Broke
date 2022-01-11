@@ -317,7 +317,7 @@ def monthly_income_step(message):
             bot.register_next_step_handler(sent_message, monthly_income_step)
             return
 
-    if len(user.montly_income) != 0: # if the user previously inputted monthly income(s); this is to solve the problem of the user inputting none even after he has already inputted monthly income(s) previously, resulting in the showing the monthly income and going to the number of months of internship/vacation step in the same step
+    if len(user.monthly_income) != 0: # if the user previously inputted monthly income(s); this is to solve the problem of the user inputting none even after he has already inputted monthly income(s) previously, resulting in the showing the monthly income and going to the number of months of internship/vacation step in the same step
         printed_monthly_income = ''
 
         for income in user.monthly_income.keys():
